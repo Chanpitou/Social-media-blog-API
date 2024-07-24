@@ -31,7 +31,7 @@ public class MessageDAO {
                 );
                 messages.add(message);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return messages;
@@ -60,60 +60,62 @@ public class MessageDAO {
                 );
                 return message;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return null;
     }
 
     // create a new message
-    public boolean createMessage(Message message) {
+    public Message createMessage(Message message) {
         Connection connection = ConnectionUtil.getConnection();
         try {
             // pre-compile the sql statement with placeholder '?' as parameters
             String sql = "INSERT INTO message(posted_by, message_text, time_posted_epoch) VALUES(?, ?, ?);";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             // Setting the parameters using the provided message object
             ps.setInt(1, message.getPosted_by());
             ps.setString(2, message.getMessage_text());
             ps.setLong(3, message.getTime_posted_epoch());
 
-            // executing the pre-compile sql, if successful return true, else false
-            boolean rs = ps.execute();
-            return rs;
+            // executing the pre-compile sql and return the created message
+            ps.executeUpdate();
+            ResultSet pkeyResultSet = ps.getGeneratedKeys();
+            if(pkeyResultSet.next()){
+                int generated_message_id = (int) pkeyResultSet.getLong(1);
+                return new Message(generated_message_id, message.getPosted_by(), message.getMessage_text(), message.getTime_posted_epoch());
+            }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return false;
+        return null;
     }
 
     // update a message
-    public boolean UpdateMessage(int message_id, String message_text) {
+    public void UpdateMessage(int message_id, Message message) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
             // pre-compile the sql statement with placeholder '?' as parameters
             String sql = "Update message SET message_text = ? WHERE message_id = ?;";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             // Setting the parameters using the provided message object
-            ps.setString(1, message_text);
+            ps.setString(1, message.getMessage_text());
             ps.setInt(2, message_id);
             
-            // executing the pre-compile sql, if successful return true, else false
-            boolean rs = ps.execute();
-            return rs;
+            // executing the pre-compile sql and return the updated message
+            ps.executeUpdate();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return false;
     }
     
     // delete a message
-    public boolean DeleteMessage(int message_id) {
+    public void DeleteMessage(int message_id) {
         Connection connection = ConnectionUtil.getConnection();
         try {
             String sql = "DELETE FROM message WHERE message_id = ?;";
@@ -123,13 +125,12 @@ public class MessageDAO {
             ps.setInt(1, message_id);
             
             // executing the pre-compile sql, if successful return true, else false
-            boolean rs = ps.execute();
-            return rs;
+            ps.executeUpdate();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return false;
+
     }
 
     // get all messages of a user by account_id
@@ -155,7 +156,7 @@ public class MessageDAO {
                 );
                 user_messages.add(message);
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return user_messages;

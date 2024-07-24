@@ -2,12 +2,15 @@ package Service;
 
 import java.util.List;
 
+import DAO.AccountDAO;
 import DAO.MessageDAO;
+import Model.Account;
 import Model.Message;
 
 public class MessageService {
 
     private MessageDAO messageDAO;
+    private AccountDAO accountDAO;
     // contructors
     public MessageService(){
         this.messageDAO = new MessageDAO();
@@ -18,7 +21,7 @@ public class MessageService {
     }
 
     // get all messages
-    public List<Message> getAllMessages(Message message){
+    public List<Message> getAllMessages(){
         return messageDAO.getAllMessages();
     }
 
@@ -29,30 +32,39 @@ public class MessageService {
 
     // create a new message
     public Message createNewMessage(Message message) {
-        boolean created = messageDAO.createMessage(message);
-        if (created){
-            return messageDAO.getMessageByMessageId(message.getMessage_id());
+        if (message.getMessage_text().length() == 0 || message.getMessage_text().length() >= 255) {
+            return null;
+        } else {
+            return messageDAO.createMessage(message);
         }
-        return null;
     }
 
+        
+
     // update a message
-    public Message updateExistingMessage(int message_id, String message_text){
-        boolean updated = messageDAO.UpdateMessage(message_id, message_text);
-        if (updated) {
-            return messageDAO.getMessageByMessageId(message_id);
+    public Message updateExistingMessage(int message_id, Message message){
+        if (message.getMessage_text().length() == 0 || message.getMessage_text().length() >= 255) {
+            return null;
         }
-        return null;
+        if (messageDAO.getMessageByMessageId(message_id) != null) {
+            messageDAO.UpdateMessage(message_id, message);
+            return messageDAO.getMessageByMessageId(message_id);
+        } else {
+            return null;
+        }
+        
     }
 
     // delete a message
     public Message deleteExistingMessage(int message_id){
-        Message deleted_message = messageDAO.getMessageByMessageId(message_id);
-        boolean deleted = messageDAO.DeleteMessage(message_id);
-        if (deleted) {
-            return deleted_message;
+        Message message = messageDAO.getMessageByMessageId(message_id);
+        if (messageDAO.getMessageByMessageId(message_id) != null) {
+            messageDAO.DeleteMessage(message_id);
+            return message;
+        } else {
+            return null;
         }
-        return null;
+
     }
 
     // get all messages of a user by account id
