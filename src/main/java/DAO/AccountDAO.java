@@ -5,35 +5,25 @@ import java.sql.*;
 import Model.Account;
 import Util.ConnectionUtil;
 
+
 public class AccountDAO {
-    
+
     // user registration
     public Account userRegistration(Account account) {
         Connection connection = ConnectionUtil.getConnection();
         try {
-
             // pre-compile the sql statement using placeholder '?' as parameters
             String sql_create = "INSERT INTO account (username, password) VALUES (?, ?);";
             PreparedStatement ps1 = connection.prepareStatement(sql_create);
+
+            // Setting the parameters using provided account object
             ps1.setString(1, account.getUsername());
             ps1.setString(2, account.getPassword());
             ps1.executeUpdate();
             
-            // String sql_get = "SELECT * FROM account WHERE username = ?;";
-            // PreparedStatement ps2 = connection.prepareStatement(sql_get);
-            // ps2.setString(1, account.getUsername());
-                
-            // ResultSet rs = ps2.executeQuery();
-            // while (rs.next()) {
-            //     Account new_account = new Account(
-            //         rs.getInt("account_id"),
-            //         rs.getString("username"),
-            //         rs.getString("password"));
-
-            //     return new_account;
-            // }
+            // use helper method "getAccount()" to return the newly registered account
             return getAccount(account.getUsername());
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return null;
@@ -42,7 +32,7 @@ public class AccountDAO {
     // login
     public Account userLogin(Account account) {
         Connection connection = ConnectionUtil.getConnection();
-        Account login_account;
+        
         try {
             // pre-compile the sql statement using placeholder '?' as parameters
             String sql = "SELECT * FROM account WHERE username = ? AND password = ?;";
@@ -55,23 +45,20 @@ public class AccountDAO {
             // execute, get result set, and return the account
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                login_account = new Account(
+                Account login_account = new Account(
                     rs.getInt("account_id"),
                     rs.getString("username"),
                     rs.getString("password"));
                 return login_account;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
-        // if username or password is not within the database, return null
         return null;
-
     }
 
-    // get account by username
-    public Account getAccount(String username) {
+    // get account by username (Private method)
+    private Account getAccount(String username) {
         Connection connection = ConnectionUtil.getConnection();
         try {
             // pre-compile the sql statement using placeholder '?' as parameters
@@ -91,7 +78,7 @@ public class AccountDAO {
 
                 return account;
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
         return null;

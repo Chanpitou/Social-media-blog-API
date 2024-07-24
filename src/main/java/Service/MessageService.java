@@ -2,20 +2,17 @@ package Service;
 
 import java.util.List;
 
-import DAO.AccountDAO;
 import DAO.MessageDAO;
-import Model.Account;
 import Model.Message;
 
 public class MessageService {
 
     private MessageDAO messageDAO;
-    private AccountDAO accountDAO;
+
     // contructors
     public MessageService(){
         this.messageDAO = new MessageDAO();
     }
-
     public MessageService(MessageDAO messageDAO){
         this.messageDAO = messageDAO;
     }
@@ -32,39 +29,47 @@ public class MessageService {
 
     // create a new message
     public Message createNewMessage(Message message) {
-        if (message.getMessage_text().length() == 0 || message.getMessage_text().length() >= 255) {
+        // conditions for create new messages
+        final boolean MESSAGE_BLANK = message.getMessage_text().length() == 0;
+        final boolean MESSAGE_LENGTH_EXCEEDED = message.getMessage_text().length() >= 255;
+
+        if (MESSAGE_BLANK || MESSAGE_LENGTH_EXCEEDED) {
             return null;
         } else {
             return messageDAO.createMessage(message);
         }
     }
 
-        
-
     // update a message
     public Message updateExistingMessage(int message_id, Message message){
-        if (message.getMessage_text().length() == 0 || message.getMessage_text().length() >= 255) {
+        // conditions for updating a message
+        final boolean MESSAGE_BLANK = message.getMessage_text().length() == 0;
+        final boolean MESSAGE_LENGTH_EXCEEDED = message.getMessage_text().length() >= 255;
+        final boolean MESSAGE_EXIST = messageDAO.getMessageByMessageId(message_id) != null;
+
+        if (MESSAGE_BLANK || MESSAGE_LENGTH_EXCEEDED) {
             return null;
         }
-        if (messageDAO.getMessageByMessageId(message_id) != null) {
+        if (MESSAGE_EXIST) {
             messageDAO.UpdateMessage(message_id, message);
             return messageDAO.getMessageByMessageId(message_id);
         } else {
             return null;
         }
-        
     }
 
     // delete a message
     public Message deleteExistingMessage(int message_id){
         Message message = messageDAO.getMessageByMessageId(message_id);
-        if (messageDAO.getMessageByMessageId(message_id) != null) {
+        // condition for deleting a message
+        final boolean MESSAGE_EXIST = messageDAO.getMessageByMessageId(message_id) != null;
+
+        if (MESSAGE_EXIST) {
             messageDAO.DeleteMessage(message_id);
             return message;
         } else {
             return null;
         }
-
     }
 
     // get all messages of a user by account id

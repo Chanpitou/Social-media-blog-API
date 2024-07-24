@@ -7,7 +7,7 @@ import Model.Message;
 import Util.ConnectionUtil;
 
 public class MessageDAO {
-    
+
     // get all messages
     public List<Message> getAllMessages() {
 
@@ -96,17 +96,16 @@ public class MessageDAO {
     // update a message
     public void UpdateMessage(int message_id, Message message) {
         Connection connection = ConnectionUtil.getConnection();
-
         try {
             // pre-compile the sql statement with placeholder '?' as parameters
-            String sql = "Update message SET message_text = ? WHERE message_id = ?;";
+            String sql = "UPDATE message SET message_text = ? WHERE message_id = ?;";
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-            // Setting the parameters using the provided message object
+            // Setting the parameters using the provided message_id and message object
             ps.setString(1, message.getMessage_text());
             ps.setInt(2, message_id);
             
-            // executing the pre-compile sql and return the updated message
+            // executing the pre-compile sql
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -118,19 +117,19 @@ public class MessageDAO {
     public void DeleteMessage(int message_id) {
         Connection connection = ConnectionUtil.getConnection();
         try {
+            // pre-compile the sql statement
             String sql = "DELETE FROM message WHERE message_id = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
 
-            // Setting the parameters using the provided message_id
+            // Setting the parameter using the provided message_id
             ps.setInt(1, message_id);
             
-            // executing the pre-compile sql, if successful return true, else false
+            // executing the pre-compile sql
             ps.executeUpdate();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
     }
 
     // get all messages of a user by account_id
@@ -143,6 +142,7 @@ public class MessageDAO {
             String sql = "SELECT * FROM message WHERE posted_by = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
 
+            // Setting the parameter using the provided account_id
             ps.setInt(1, account_id);
 
             // executing the pre-compile sql, and add all user messages into the list
@@ -159,6 +159,7 @@ public class MessageDAO {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return user_messages;
+        return user_messages;   
     }
 }
+

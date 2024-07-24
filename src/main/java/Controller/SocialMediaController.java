@@ -47,6 +47,7 @@ public class SocialMediaController {
 
         return app;
     }
+
     // account handlers
     // for register new user
     private void registerHandler(Context context) throws JsonProcessingException{
@@ -59,7 +60,6 @@ public class SocialMediaController {
         } else{
             context.status(400); 
         }
-        
     }
 
     // for user login
@@ -79,7 +79,6 @@ public class SocialMediaController {
     private void getAllMessagesHandler(Context context) {
         List<Message> messages = messageService.getAllMessages();
         context.json(messages);
-        
     }
 
     // getting a message by id
@@ -91,14 +90,13 @@ public class SocialMediaController {
         } else {
             context.result();
         }
-        
     }
 
     // creating a new message
     private void createMessageHandler(Context context) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Message message = mapper.readValue(context.body(), Message.class);
-        Message created_Message = messageService.createNewMessage(message);
+        Message created_Message = messageService.createNewMessage(message); 
         if (created_Message != null){
             context.json(mapper.writeValueAsString(created_Message));
         } else{
