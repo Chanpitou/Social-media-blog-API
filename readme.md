@@ -56,8 +56,8 @@ To set up and run this project locally, follow these steps:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Chanpitou/Chanpitou-pep-project.git
-   cd Chanpitou-pep-project
+   git clone https://github.com/Chanpitou/Social-media-blog-API.git
+   cd Social-media-blog-API
    ```
 2. **Run the program:**
    - Run the provided Main.java using your preferred IDE (i.e. VS Code, IntelliJ IDE)
